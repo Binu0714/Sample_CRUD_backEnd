@@ -15,10 +15,11 @@ export const signUp = async (req: Request, res: Response) => {
         });
 
         if (error) {
+            console.log("Supabase Error:", error.message); 
             return res.status(400).json({ error: error.message });
         }
 
-        return res.status(200).json({ 
+        return res.status(201).json({ 
             message: 'User registered successfully', 
             user: data.user 
         });
