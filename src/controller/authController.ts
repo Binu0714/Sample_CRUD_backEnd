@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { supabase } from '../config/supabase.js'
+import { supabase } from '../config/supabase';
 
 export const signUp = async (req: Request, res: Response) => {
     try{
