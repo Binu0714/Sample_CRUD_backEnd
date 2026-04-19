@@ -16,10 +16,10 @@ const signRefreshToken = (user: any) => {
 
 export const signUp = async (req: Request, res: Response) => {
     try {
-        const { full_name, email, password } = req.body;
+        const { email, password } = req.body;
 
-        if (!full_name || !email || !password) {
-            return res.status(400).json({ error: 'full_name, email, and password are required' });
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email and password are required' });
         }
 
         const { data: existingUser } = await supabase
@@ -38,7 +38,7 @@ export const signUp = async (req: Request, res: Response) => {
             .from('users')
             .insert([
                 { 
-                    full_name, 
+                    full_name : " ", 
                     email, 
                     password_hash: hashedPassword, 
                     role: 'customer' 
