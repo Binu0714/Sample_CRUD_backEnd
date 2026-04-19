@@ -65,20 +65,35 @@ export const LogIn = async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Email and password are required' });
         }
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        });
+        const { data:user, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', email)
+            .maybeSingle();
 
-        if (error) {
-            console.log("Login Error:", error.message);
-            return res.status(401).json({ error: error.message });
+        if (error || !user) {
+            return res.status(401).json({ error: 'Invalid email or password' });
         }
 
+        const isMatch = await bcrypt.compare(password, user.password_hash);
+
+        if (!isMatch) {
+            return res.status(401).json({ error: 'Invalid email or password' });
+        }
+
+        const accessToken = signAccessToken(user);
+        const refreshToken = signRefreshToken(user);
+
         return res.status(200).json({
-            message: 'Login successful',
-            user: data.user,
-            session: data.session,
+            message: "Login successful",
+            accessToken,
+            refreshToken,
+            user: {
+                id: user.id,
+                full_name: user.full_name,
+                email: user.email,
+                role: user.role
+            }
         });
 
     } catch (err) {
