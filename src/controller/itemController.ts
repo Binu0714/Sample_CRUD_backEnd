@@ -79,3 +79,26 @@ export const updateItem = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 }
+
+export const deleteItem = async (req: AuthRequest, res: Response) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+
+        const { data, error } = await supabase
+            .from('items')
+            .delete()
+            .eq('id', id)
+            .eq('user_id', userId)
+            .select();
+
+        if (error || !data || data.length === 0) {
+            return res.status(404).json({ error: "Item not found or unauthorized" });
+        }
+
+        return res.status(200).json({ message: "Item deleted successfully" });
+        
+    } catch (error) {
+        return res.status(500).json({ error: "Internal server error" });
+    }
+}
