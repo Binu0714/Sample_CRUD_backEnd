@@ -49,8 +49,33 @@ export const getMyItems = async (req: AuthRequest, res: Response) => {
         if (error) throw error;
 
         return res.status(200).json({ data });
-        
+
     }catch (error) {
         return res.status(500).json({ error: "Internal Server Error" });
     }
+}
+
+export const updateItem = async (req: AuthRequest, res: Response) => {
+    try{
+        const { id } = req.params;
+        const { description, user_type } = req.body;
+        const userId = req.user.id;
+
+        const { data, error } = await supabase
+            .from('items')
+            .update({ description, user_type })
+            .eq('id', id)
+            .eq('user_id', userId)
+            .select()
+            .single();
+
+        if(error || !data) {
+            return res.status(404).json({ error: "Item not found or you don't have permission to update it" });
+        }
+
+        return res.status(200).json({ message: "Item updated successfully", data });
+
+    } catch (err) {
+    return res.status(500).json({ error: "Internal server error" });
+  }
 }
